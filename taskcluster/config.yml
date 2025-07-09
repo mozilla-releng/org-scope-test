@@ -3,7 +3,7 @@ trust-domain: "mozilla"
 task-priority: low
 
 taskgraph:
-  cached-task-prefix: "mozilla.v2.org-scope-test"
+  cached-task-prefix: "mozilla.v2.mozilla"
   repositories:
     org_scope_test:
       name: "org-scope-test"
