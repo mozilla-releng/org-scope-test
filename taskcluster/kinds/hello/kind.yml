@@ -10,6 +10,8 @@ task-defaults:
 
 tasks:
   world:
+    scopes:
+      - secrets:get:project/releng/tooltool/ci
     noun: world
     run:
       using: run-task
