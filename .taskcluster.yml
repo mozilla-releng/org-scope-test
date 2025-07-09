@@ -151,7 +151,22 @@ tasks:
                           'tasks_for == "cron"':
                               kind: cron-task
 
-                  routes: []
+                  routes:
+                      $flatten:
+                          - checks
+                          - $switch:
+                                'tasks_for == "github-push"':
+                                    - "index.${trustDomain}.v2.${trustDomain}.latest.taskgraph.decision"
+                                    - "index.${trustDomain}.v2.${trustDomain}.revision.${head_sha}.taskgraph.decision"
+                                'tasks_for == "action"':
+                                    - "index.${trustDomain}.v2.${trustDomain}.revision.${head_sha}.taskgraph.actions.${ownTaskId}"
+                                'tasks_for == "cron"':
+                                    - "index.${trustDomain}.v2.${trustDomain}.latest.taskgraph.decision-${cron.job_name}"
+                                    - "index.${trustDomain}.v2.${trustDomain}.revision.${head_sha}.taskgraph.decision-${cron.job_name}"
+                                    # list each cron task on this revision, so actions can find them
+                                    - 'index.${trustDomain}.v2.${trustDomain}.revision.${head_sha}.cron.${ownTaskId}'
+                                $default: []
+
                   scopes:
                       $switch:
                           'tasks_for in ["github-push"]':
@@ -205,6 +220,9 @@ tasks:
                                         ACTION_TASK_ID: {$json: {$eval: 'taskId'}}  # taskId of the target task (JSON-encoded)
                                         ACTION_INPUT: {$json: {$eval: 'input'}}
                                         ACTION_CALLBACK: '${action.cb_name}'
+
+                          cache:
+                              "${trustDomain}-project-${project}-level-${level}-checkouts-sparse-v2": /builds/worker/checkouts
 
                           features:
                               taskclusterProxy: true
